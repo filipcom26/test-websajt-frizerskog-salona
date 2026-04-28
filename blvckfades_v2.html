@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">Barbershop — Premium Grooming</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --gold: #c9a84c;
+  --gold-light: #e8c96a;
+  --black: #0a0a0a;
+  --dark: #111111;
+  --card: #181818;
+  --card2: #1f1f1f;
+  --border: rgba(201,168,76,0.2);
+  --border-subtle: rgba(255,255,255,0.07);
+  --text: #f0ece4;
+  --text-muted: #8a8278;
+  --text-dim: #5a5650;
+  --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--black);color:var(--text);overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.5}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.4rem 5%;display:flex;align-items:center;justify-content:space-between;transition:var(--transition)}
+nav.scrolled{padding:.9rem 5%;background:rgba(10,10,10,.92);backdrop-filter:blur(20px);border-bottom:.5px solid var(--border)}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;letter-spacing:.15em;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:.6rem}
+.nav-logo span{color:var(--gold)}
+.nav-links{display:flex;align-items:center;gap:2.2rem;list-style:none}
+.nav-links a{color:var(--text-muted);text-decoration:none;font-size:.82rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;transition:color var(--transition)}
+.nav-links a:hover{color:var(--text)}
+.btn-nav{background:var(--gold);color:var(--black);border:none;padding:.55rem 1.4rem;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-block;transition:background var(--transition)}
+.btn-nav:hover{background:var(--gold-light)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.hamburger span{display:block;width:22px;height:1.5px;background:var(--text);transition:var(--transition)}
+.mobile-drawer{display:none;position:fixed;inset:0;background:rgba(10,10,10,.97);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:2rem}
+.mobile-drawer.open{display:flex}
+.mobile-drawer a{font-family:'Playfair Display',serif;font-size:2rem;color:var(--text);text-decoration:none}
+.mobile-drawer a:hover{color:var(--gold)}
+.drawer-close{position:absolute;top:1.5rem;right:5%;font-size:1.5rem;color:var(--text-muted);cursor:pointer;background:none;border:none}
+
+/* HERO */
+#hero{height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:0 5%}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 70% 50%,rgba(201,168,76,.07) 0%,transparent 70%),radial-gradient(ellipse 40% 60% at 20% 80%,rgba(201,168,76,.04) 0%,transparent 60%)}
+.hero-line{position:absolute;top:0;bottom:0;right:38%;width:.5px;background:linear-gradient(to bottom,transparent,var(--border),transparent)}
+.hero-content{position:relative;z-index:1;max-width:700px}
+.hero-eyebrow{font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem;opacity:0;animation:fadeUp .8s ease forwards .2s;display:flex;align-items:center;gap:1rem}
+.hero-eyebrow::before{content:'';display:block;width:30px;height:.5px;background:var(--gold)}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(3.5rem,8vw,7rem);font-weight:900;line-height:.95;letter-spacing:-.02em;margin-bottom:1.8rem}
+.hero-title .line1{display:block;opacity:0;animation:fadeUp .8s ease forwards .4s}
+.hero-title .line2{display:block;font-style:italic;color:var(--gold);opacity:0;animation:fadeUp .8s ease forwards .6s}
+.hero-sub{font-size:1.05rem;color:var(--text-muted);font-weight:300;max-width:480px;line-height:1.7;margin-bottom:2.5rem;opacity:0;animation:fadeUp .8s ease forwards .8s}
+.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;opacity:0;animation:fadeUp .8s ease forwards 1s}
+.btn-primary{background:var(--gold);color:var(--black);border:none;padding:.9rem 2rem;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-block;transition:all var(--transition)}
+.btn-primary:hover{background:var(--gold-light);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--text);border:.5px solid rgba(255,255,255,.3);padding:.9rem 2rem;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-block;transition:all var(--transition)}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.scroll-indicator{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;opacity:0;animation:fadeIn 1s ease forwards 1.4s}
+.scroll-indicator span{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text-dim)}
+.scroll-chevron{width:16px;height:16px;border-right:1px solid var(--gold);border-bottom:1px solid var(--gold);transform:rotate(45deg);animation:bounce 2s ease infinite}
+
+/* SECTIONS */
+section{position:relative;z-index:1}
+.section-pad{padding:7rem 5%}
+.section-eyebrow{font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:1rem}
+.section-eyebrow::before{content:'';display:block;width:24px;height:.5px;background:var(--gold)}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:700;line-height:1.1;margin-bottom:1rem}
+.section-divider{width:40px;height:1px;background:var(--gold);margin:1.5rem 0 3rem}
+
+/* SERVICES */
+#services{background:var(--dark)}
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border-subtle);border:1px solid var(--border-subtle)}
+.service-card{background:var(--dark);padding:2.5rem 2rem;transition:all var(--transition);position:relative;overflow:hidden}
+.service-card::after{content:'';position:absolute;inset:0;border:1px solid var(--gold);opacity:0;transition:opacity var(--transition)}
+.service-card:hover{background:var(--card);transform:translateY(-3px)}
+.service-card:hover::after{opacity:1}
+.service-icon{width:44px;height:44px;margin-bottom:1.5rem;color:var(--gold)}
+.service-name{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;margin-bottom:.5rem}
+.service-desc{font-size:.88rem;color:var(--text-muted);line-height:1.6;margin-bottom:1.2rem}
+.service-price{font-size:1.4rem;font-weight:600;color:var(--gold);font-family:'Playfair Display',serif}
+.service-duration{font-size:.75rem;color:var(--text-dim);margin-left:.4rem}
+
+/* GALLERY */
+#gallery{background:var(--black)}
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:260px;gap:3px}
+.gallery-tile{position:relative;overflow:hidden;cursor:pointer}
+.gallery-tile:nth-child(1){grid-row:span 2}
+.gallery-tile:nth-child(5){grid-row:span 2}
+.gallery-tile-bg{width:100%;height:100%;transition:transform .5s ease;display:flex;align-items:flex-end;padding:1.2rem}
+.gallery-tile:hover .gallery-tile-bg{transform:scale(1.05)}
+.gallery-label{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.7);font-weight:500;background:rgba(0,0,0,.5);padding:.3rem .7rem;backdrop-filter:blur(4px)}
+.gallery-overlay{position:absolute;inset:0;background:rgba(201,168,76,.2);opacity:0;transition:opacity var(--transition)}
+.gallery-tile:hover .gallery-overlay{opacity:1}
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:2000;align-items:center;justify-content:center}
+.lightbox.open{display:flex}
+.lightbox-content{width:80vw;max-width:900px;height:70vh;position:relative}
+.lightbox-close,.lightbox-prev,.lightbox-next{position:absolute;background:rgba(201,168,76,.8);border:none;color:var(--black);width:42px;height:42px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;font-weight:700;transition:background var(--transition)}
+.lightbox-close{top:-52px;right:0}
+.lightbox-prev{top:50%;left:-56px;transform:translateY(-50%)}
+.lightbox-next{top:50%;right:-56px;transform:translateY(-50%)}
+.lightbox-close:hover,.lightbox-prev:hover,.lightbox-next:hover{background:var(--gold)}
+
+/* ABOUT */
+#about{background:var(--dark)}
+.about-inner{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center}
+.about-quote{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.5vw,2.8rem);font-style:italic;line-height:1.3;color:var(--text);position:relative;padding-left:2rem}
+.about-quote::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
+.about-quote em{color:var(--gold);font-style:normal}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:3rem}
+.stat-item{border-left:2px solid var(--gold);padding-left:1.2rem}
+.stat-number{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--gold);display:block}
+.stat-label{font-size:.8rem;color:var(--text-muted);letter-spacing:.05em}
+.why-items{display:flex;flex-direction:column;gap:1rem}
+.why-item{display:flex;align-items:flex-start;gap:1rem;padding:1rem;background:var(--card);border-left:2px solid var(--border);transition:border-color var(--transition)}
+.why-item:hover{border-color:var(--gold)}
+.why-icon{color:var(--gold);font-size:1.2rem;flex-shrink:0;margin-top:2px}
+.why-text h4{font-size:.9rem;font-weight:600;margin-bottom:.2rem}
+.why-text p{font-size:.82rem;color:var(--text-muted)}
+
+/* TEAM */
+#team{background:var(--black)}
+.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+.team-card{background:var(--card);border:1px solid var(--border-subtle);overflow:hidden;transition:all var(--transition)}
+.team-card:hover{border-color:var(--border);transform:translateY(-4px)}
+.team-avatar{height:220px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:3rem;font-weight:700;color:var(--gold)}
+.team-info{padding:1.5rem}
+.team-name{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;margin-bottom:.2rem}
+.team-role{font-size:.75rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem}
+.team-specialty{font-size:.82rem;color:var(--text-muted)}
+
+/* BOOKING */
+#booking{background:var(--dark)}
+.booking-inner{display:grid;grid-template-columns:1fr 1.6fr;gap:5rem;align-items:start}
+.booking-info p{color:var(--text-muted);font-size:.92rem;line-height:1.8;margin-bottom:2rem}
+.booking-contact-item{display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem;font-size:.88rem;color:var(--text-muted)}
+.booking-contact-item span{color:var(--gold);font-size:1rem}
+.booking-form{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.form-group{display:flex;flex-direction:column;gap:.5rem}
+.form-group.full{grid-column:span 2}
+.form-group label{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted);font-weight:500}
+.form-group input,.form-group select,.form-group textarea{background:var(--card2);border:.5px solid var(--border-subtle);color:var(--text);padding:.85rem 1rem;font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color var(--transition);-webkit-appearance:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold)}
+.form-group select option{background:var(--card2)}
+.form-group textarea{resize:vertical;min-height:90px}
+.time-slots-label{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted);font-weight:500;margin-bottom:.5rem;grid-column:span 2}
+.time-slots{display:flex;flex-wrap:wrap;gap:.5rem;grid-column:span 2}
+.time-chip{padding:.45rem .9rem;border:.5px solid var(--border-subtle);background:transparent;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:.8rem;cursor:pointer;transition:all var(--transition)}
+.time-chip:hover{border-color:var(--gold);color:var(--text)}
+.time-chip.selected{background:var(--gold);color:var(--black);border-color:var(--gold);font-weight:600}
+.time-chip.taken{opacity:.3;cursor:not-allowed}
+.privacy-check{grid-column:span 2;display:flex;align-items:flex-start;gap:.8rem;font-size:.82rem;color:var(--text-muted);line-height:1.5}
+.privacy-check input[type=checkbox]{width:16px;height:16px;margin-top:2px;accent-color:var(--gold);flex-shrink:0;cursor:pointer}
+.privacy-check a{color:var(--gold);text-decoration:none}
+.privacy-check a:hover{text-decoration:underline}
+.btn-submit{grid-column:span 2;background:var(--gold);color:var(--black);border:none;padding:1.1rem;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:all var(--transition)}
+.btn-submit:hover{background:var(--gold-light)}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed}
+.booking-success{display:none;grid-column:span 2;text-align:center;padding:3rem 2rem;background:var(--card2);border:1px solid var(--border)}
+.success-check{width:60px;height:60px;border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.5rem;color:var(--gold);animation:scaleIn .4s ease}
+.booking-success h3{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:.7rem}
+.booking-success p{color:var(--text-muted);font-size:.9rem}
+
+/* TESTIMONIALS */
+#testimonials{background:var(--black);overflow:hidden}
+.testimonial-track{display:flex;transition:transform .6s cubic-bezier(.4,0,.2,1)}
+.testimonial-slide{min-width:100%;padding:0 15%;text-align:center}
+.testi-stars{color:var(--gold);font-size:1.1rem;margin-bottom:1.5rem;letter-spacing:.2em}
+.testi-quote{font-family:'Playfair Display',serif;font-size:clamp(1.1rem,2.5vw,1.5rem);font-style:italic;line-height:1.6;color:var(--text);margin-bottom:2rem}
+.testi-author{font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.testi-dots{display:flex;justify-content:center;gap:.5rem;margin-top:2.5rem}
+.testi-dot{width:24px;height:2px;background:var(--border-subtle);cursor:pointer;transition:background var(--transition)}
+.testi-dot.active{background:var(--gold)}
+
+/* LOCATION */
+#location{background:var(--dark)}
+.location-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem}
+.map-link{color:var(--gold);text-decoration:none;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;transition:color var(--transition);margin-top:1.2rem}
+.map-link:hover{color:var(--gold-light)}
+.hours-table{width:100%;border-collapse:collapse}
+.hours-table tr{border-bottom:.5px solid var(--border-subtle)}
+.hours-table td{padding:.85rem 0;font-size:.88rem}
+.hours-table td:last-child{text-align:right;color:var(--text-muted)}
+.hours-table tr.today td{color:var(--gold);font-weight:600}
+.hours-table tr.today td:last-child{color:var(--gold)}
+
+/* PRIVACY POLICY PAGE */
+#privacy-page{display:none;position:fixed;inset:0;background:var(--black);z-index:4000;overflow-y:auto;padding:4rem 5%}
+#privacy-page.open{display:block}
+.privacy-content{max-width:720px;margin:0 auto}
+.privacy-content h1{font-family:'Playfair Display',serif;font-size:2rem;margin-bottom:.5rem}
+.privacy-content h2{font-family:'Playfair Display',serif;font-size:1.2rem;margin:2rem 0 .8rem;color:var(--gold)}
+.privacy-content p{font-size:.88rem;color:var(--text-muted);line-height:1.8;margin-bottom:1rem}
+.privacy-content ul{padding-left:1.5rem;margin-bottom:1rem}
+.privacy-content ul li{font-size:.88rem;color:var(--text-muted);line-height:1.8}
+.privacy-close{position:fixed;top:1.5rem;right:5%;background:var(--gold);color:var(--black);border:none;padding:.5rem 1.2rem;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+
+/* FOOTER */
+footer{background:var(--black);border-top:.5px solid var(--border-subtle);padding:3rem 5% 2rem}
+.footer-inner{display:grid;grid-template-columns:2fr 1fr 1fr;gap:3rem;margin-bottom:2.5rem}
+.footer-logo{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;letter-spacing:.15em;margin-bottom:.8rem}
+.footer-logo span{color:var(--gold)}
+.footer-tagline{font-size:.82rem;color:var(--text-dim);font-style:italic;margin-bottom:1.5rem}
+.footer-socials{display:flex;gap:.8rem}
+.social-btn{width:36px;height:36px;border:.5px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--text-muted);font-size:.9rem;transition:all var(--transition)}
+.social-btn:hover{border-color:var(--gold);color:var(--gold)}
+.footer-col h4{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;font-weight:600}
+.footer-col ul{list-style:none}
+.footer-col ul li{margin-bottom:.7rem}
+.footer-col ul a{color:var(--text-muted);text-decoration:none;font-size:.85rem;transition:color var(--transition)}
+.footer-col ul a:hover{color:var(--text)}
+.footer-bottom{border-top:.5px solid var(--border-subtle);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center}
+.footer-bottom p{font-size:.78rem;color:var(--text-dim)}
+#back-top{position:fixed;bottom:2rem;right:2rem;width:44px;height:44px;background:var(--gold);color:var(--black);border:none;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:1rem;font-weight:700;z-index:500;transition:all var(--transition)}
+#back-top.visible{display:flex}
+#back-top:hover{background:var(--gold-light);transform:translateY(-2px)}
+
+/* ADMIN */
+#admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:3000;overflow-y:auto}
+#admin-overlay.open{display:block}
+.admin-login{max-width:420px;margin:12vh auto 0;padding:2.5rem;background:var(--card);border:1px solid var(--border)}
+.admin-login h2{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:.4rem}
+.admin-login p{color:var(--text-muted);font-size:.85rem;margin-bottom:2rem}
+.admin-login-fields{display:flex;flex-direction:column;gap:1rem}
+.admin-error{color:#e05555;font-size:.82rem;display:none;margin-top:-.4rem}
+.admin-panel{padding:2rem 4%}
+.admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:.5px solid var(--border-subtle)}
+.admin-header h2{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700}
+.admin-tabs{display:flex;gap:0;margin-bottom:2rem;border:.5px solid var(--border-subtle);overflow:hidden}
+.admin-tab{padding:.7rem 1.5rem;background:transparent;border:none;color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all var(--transition);border-right:.5px solid var(--border-subtle)}
+.admin-tab:last-child{border-right:none}
+.admin-tab.active{background:var(--gold);color:var(--black);font-weight:600}
+.admin-tab:hover:not(.active){background:var(--card);color:var(--text)}
+.admin-section{display:none}
+.admin-section.active{display:block}
+.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.admin-stat{background:var(--card);border:.5px solid var(--border-subtle);padding:1.2rem 1.5rem;border-left:2px solid var(--gold)}
+.admin-stat-val{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--gold)}
+.admin-stat-label{font-size:.75rem;color:var(--text-dim);margin-top:.2rem}
+.filter-bar{display:flex;gap:1rem;margin-bottom:1.5rem;align-items:center;flex-wrap:wrap}
+.filter-bar input,.filter-bar select{background:var(--card);border:.5px solid var(--border-subtle);color:var(--text);padding:.5rem .9rem;font-family:'DM Sans',sans-serif;font-size:.82rem;outline:none;transition:border-color var(--transition)}
+.filter-bar input:focus,.filter-bar select:focus{border-color:var(--gold)}
+.appt-table{width:100%;border-collapse:collapse;font-size:.85rem}
+.appt-table th{text-align:left;padding:.8rem 1rem;background:var(--card);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:600;border-bottom:1px solid var(--border)}
+.appt-table td{padding:.9rem 1rem;border-bottom:.5px solid var(--border-subtle);color:var(--text-muted);vertical-align:middle}
+.appt-table tr:hover td{background:var(--card)}
+.status-badge{display:inline-block;padding:.2rem .6rem;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+.status-confirmed{background:rgba(201,168,76,.15);color:var(--gold)}
+.status-pending{background:rgba(255,255,255,.07);color:var(--text-muted)}
+.status-cancelled{background:rgba(220,50,50,.1);color:#e05555}
+.btn-sm{padding:.3rem .7rem;font-size:.72rem;background:transparent;border:.5px solid var(--border-subtle);color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--transition)}
+.btn-sm:hover{border-color:var(--gold);color:var(--gold)}
+.btn-sm.danger:hover{border-color:#e05555;color:#e05555}
+.empty-state{text-align:center;padding:3rem;color:var(--text-dim);font-size:.88rem}
+
+/* ANALYTICS CHARTS */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+.chart-card{background:var(--card);border:.5px solid var(--border-subtle);padding:1.5rem}
+.chart-card h4{font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem;font-weight:600}
+.bar-chart{display:flex;flex-direction:column;gap:.6rem}
+.bar-row{display:flex;align-items:center;gap:.8rem;font-size:.78rem}
+.bar-label{width:80px;color:var(--text-muted);text-align:right;flex-shrink:0;font-size:.75rem}
+.bar-track{flex:1;height:18px;background:var(--card2);position:relative;overflow:hidden}
+.bar-fill{height:100%;background:var(--gold);transition:width .8s cubic-bezier(.4,0,.2,1)}
+.bar-val{width:36px;color:var(--text-dim);font-size:.72rem;flex-shrink:0}
+.donut-wrap{display:flex;align-items:center;gap:1.5rem}
+.donut-legend{display:flex;flex-direction:column;gap:.5rem;flex:1}
+.legend-item{display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:var(--text-muted)}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* REVEAL ANIMATIONS */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes bounce{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(5px)}}
+@keyframes scaleIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* RESPONSIVE */
+@media(max-width:1024px){.services-grid{grid-template-columns:repeat(2,1fr)}.team-grid{grid-template-columns:repeat(2,1fr)}.about-inner{gap:3rem}.booking-inner{grid-template-columns:1fr;gap:2.5rem}.footer-inner{grid-template-columns:1fr 1fr}.admin-stats{grid-template-columns:repeat(2,1fr)}.chart-grid{grid-template-columns:1fr}}
+@media(max-width:768px){.nav-links,.btn-nav{display:none}.hamburger{display:flex}.services-grid{grid-template-columns:1fr}.gallery-grid{grid-template-columns:1fr 1fr}.gallery-tile:nth-child(1),.gallery-tile:nth-child(5){grid-row:span 1}.about-inner{grid-template-columns:1fr}.team-grid{grid-template-columns:1fr 1fr}.location-inner{grid-template-columns:1fr}.footer-inner{grid-template-columns:1fr}.booking-form{grid-template-columns:1fr}.form-group.full,.time-slots-label,.time-slots,.btn-submit,.booking-success,.privacy-check{grid-column:span 1}.hero-title{font-size:clamp(2.8rem,12vw,5rem)}.section-pad{padding:5rem 5%}.testimonial-slide{padding:0 5%}.lightbox-prev{left:-10px}.lightbox-next{right:-10px}}
+@media(max-width:480px){.team-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr}.gallery-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gold)"><path d="M6 3l4 9-4 9M18 3l-4 9 4 9M2 8h20M2 16h20" stroke-linecap="round"/></svg>
+    <span id="nav-logo-text">SHOP <span>NAME</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#booking">Booking</a></li>
+    <li><a href="#location">Contact</a></li>
+    <li><a href="#" onclick="openAdmin(event)">Admin</a></li>
+  </ul>
+  <a href="#booking" class="btn-nav">Book Now</a>
+  <div class="hamburger" onclick="toggleDrawer()"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- MOBILE DRAWER -->
+<div class="mobile-drawer" id="mobileDrawer">
+  <button class="drawer-close" onclick="toggleDrawer()">✕</button>
+  <a href="#services" onclick="toggleDrawer()">Services</a>
+  <a href="#gallery" onclick="toggleDrawer()">Gallery</a>
+  <a href="#team" onclick="toggleDrawer()">Team</a>
+  <a href="#booking" onclick="toggleDrawer()">Booking</a>
+  <a href="#location" onclick="toggleDrawer()">Contact</a>
+  <a href="#booking" onclick="toggleDrawer()" style="color:var(--gold);font-style:italic">Book Now →</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-line"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow" id="hero-eyebrow">Est. 2012 — Premium Barbershop</div>
+    <h1 class="hero-title">
+      <span class="line1" id="hero-line1">SHARP CUTS.</span>
+      <span class="line2" id="hero-line2">Sharper Looks.</span>
+    </h1>
+    <p class="hero-sub" id="hero-sub">Premium grooming for the modern gentleman. Walk-ins welcome.</p>
+    <div class="hero-ctas">
+      <a href="#booking" class="btn-primary">Book Appointment</a>
+      <a href="#gallery" class="btn-outline">View Our Work</a>
+    </div>
+  </div>
+  <div class="scroll-indicator"><span>Scroll</span><div class="scroll-chevron"></div></div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="section-pad">
+  <div class="reveal">
+    <div class="section-eyebrow">What We Offer</div>
+    <h2 class="section-title">Our Services</h2>
+    <div class="section-divider"></div>
+  </div>
+  <div class="services-grid reveal" id="services-grid"></div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery" class="section-pad">
+  <div class="reveal" style="margin-bottom:3rem">
+    <div class="section-eyebrow">Our Portfolio</div>
+    <h2 class="section-title">The Work</h2>
+    <div class="section-divider"></div>
+  </div>
+  <div class="gallery-grid reveal">
+    <div class="gallery-tile" onclick="openLightbox(0)"><div class="gallery-tile-bg" style="background:linear-gradient(160deg,#1a1408,#3d2e10,#1a1408)"><span class="gallery-label">High Fade</span></div><div class="gallery-overlay"></div></div>
+    <div class="gallery-tile" onclick="openLightbox(1)"><div class="gallery-tile-bg" style="background:linear-gradient(135deg,#0f1a14,#1a3020,#0a100c)"><span class="gallery-label">Taper Cut</span></div><div class="gallery-overlay"></div></div>
+    <div class="gallery-tile" onclick="openLightbox(2)"><div class="gallery-tile-bg" style="background:linear-gradient(160deg,#1a0f08,#2e1a0a,#120b04)"><span class="gallery-label">Beard Shape</span></div><div class="gallery-overlay"></div></div>
+    <div class="gallery-tile" onclick="openLightbox(3)"><div class="gallery-tile-bg" style="background:linear-gradient(120deg,#0e0e1a,#1a1830,#080812)"><span class="gallery-label">Skin Fade</span></div><div class="gallery-overlay"></div></div>
+    <div class="gallery-tile" onclick="openLightbox(4)"><div class="gallery-tile-bg" style="background:linear-gradient(160deg,#1a1408,#2a2010,#100e06)"><span class="gallery-label">Classic Pompadour</span></div><div class="gallery-overlay"></div></div>
+    <div class="gallery-tile" onclick="openLightbox(5)"><div class="gallery-tile-bg" style="background:linear-gradient(135deg,#0d1a0d,#162416,#090e09)"><span class="gallery-label">Full Combo</span></div><div class="gallery-overlay"></div></div>
+    <div class="gallery-tile" onclick="openLightbox(6)"><div class="gallery-tile-bg" style="background:linear-gradient(160deg,#1a0e0e,#2e1414,#100808)"><span class="gallery-label">Drop Fade</span></div><div class="gallery-overlay"></div></div>
+    <div class="gallery-tile" onclick="openLightbox(7)"><div class="gallery-tile-bg" style="background:linear-gradient(120deg,#14141a,#201e2e,#0c0c14)"><span class="gallery-label">Textured Crop</span></div><div class="gallery-overlay"></div></div>
+    <div class="gallery-tile" onclick="openLightbox(8)"><div class="gallery-tile-bg" style="background:linear-gradient(135deg,#1a1000,#3a2800,#140e00)"><span class="gallery-label">Hot Shave</span></div><div class="gallery-overlay"></div></div>
+  </div>
+</section>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightboxOutside(event)">
+  <div class="lightbox-content" id="lightboxContent">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <button class="lightbox-prev" onclick="lightboxNav(-1)">‹</button>
+    <button class="lightbox-next" onclick="lightboxNav(1)">›</button>
+    <div id="lightboxDisplay" style="width:100%;height:100%"></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about" class="section-pad">
+  <div class="about-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">Our Story</div>
+      <blockquote class="about-quote" id="about-quote">"We don't just cut hair.<br>We craft <em>confidence</em>."</blockquote>
+      <div class="section-divider"></div>
+      <p id="about-text" style="color:var(--text-muted);font-size:.92rem;line-height:1.8;max-width:460px"></p>
+    </div>
+    <div class="reveal">
+      <div class="stats-grid">
+        <div class="stat-item"><span class="stat-number" data-target="12">0</span><span class="stat-label">Years Experience</span></div>
+        <div class="stat-item"><span class="stat-number" data-target="5000">0</span><span class="stat-label">Happy Clients</span></div>
+        <div class="stat-item"><span class="stat-number" data-target="4">0</span><span class="stat-label">Master Barbers</span></div>
+        <div class="stat-item"><span class="stat-number" data-target="49" data-decimal="true">0.0</span><span class="stat-label">★ Google Rating</span></div>
+      </div>
+      <div class="why-items">
+        <div class="why-item"><span class="why-icon">◈</span><div class="why-text"><h4>Premium Products Only</h4><p>We use only the finest grooming brands available.</p></div></div>
+        <div class="why-item"><span class="why-icon">◈</span><div class="why-text"><h4>Relaxed Atmosphere</h4><p>A sanctuary where you can unwind and look your best.</p></div></div>
+        <div class="why-item"><span class="why-icon">◈</span><div class="why-text"><h4>Precision Technique</h4><p>Every barber has 5+ years of certified craft experience.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team" class="section-pad">
+  <div class="reveal" style="text-align:center;margin-bottom:3rem">
+    <div class="section-eyebrow" style="justify-content:center">The Craftsmen</div>
+    <h2 class="section-title">Meet the Barbers</h2>
+    <div class="section-divider" style="margin:1.5rem auto 0"></div>
+  </div>
+  <div class="team-grid reveal" id="team-grid"></div>
+</section>
+
+<!-- BOOKING -->
+<section id="booking" class="section-pad">
+  <div class="booking-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">Reserve Your Spot</div>
+      <h2 class="section-title">Book Your Visit</h2>
+      <div class="section-divider"></div>
+      <p id="booking-info-text">Walk-ins are always welcome, but booking ahead guarantees your preferred barber and time.</p>
+      <div style="margin-top:1.5rem" id="booking-contact"></div>
+    </div>
+    <div>
+      <div class="booking-form reveal" id="bookingForm">
+        <div class="form-group"><label>Full Name</label><input type="text" id="f-name" placeholder="John Smith" required></div>
+        <div class="form-group"><label>Phone</label><input type="tel" id="f-phone" placeholder="+1 000 000 0000" required></div>
+        <div class="form-group full"><label>Email</label><input type="email" id="f-email" placeholder="you@email.com" required></div>
+        <div class="form-group"><label>Service</label><select id="f-service" required><option value="">Select service</option></select></div>
+        <div class="form-group"><label>Barber</label><select id="f-barber"><option value="No preference">No preference</option></select></div>
+        <div class="form-group full"><label>Date</label><input type="date" id="f-date" required></div>
+        <div class="time-slots-label">Select Time Slot</div>
+        <div class="time-slots" id="timeSlots"></div>
+        <div class="form-group full"><label>Notes (optional)</label><textarea id="f-notes" placeholder="Any specific requests..."></textarea></div>
+        <div class="privacy-check">
+          <input type="checkbox" id="privacy-agree">
+          <label for="privacy-agree">I have read and agree to the <a href="#" onclick="openPrivacy(event)">Privacy Policy</a>. I consent to my personal data being stored to process my booking.</label>
+        </div>
+        <button class="btn-submit" onclick="submitBooking()">Confirm Booking</button>
+        <div class="booking-success" id="bookingSuccess">
+          <div class="success-check">✓</div>
+          <h3>Booking Confirmed!</h3>
+          <p id="successMsg">We'll send a confirmation to your email shortly.</p>
+          <button onclick="resetBooking()" style="margin-top:1.5rem;background:transparent;border:.5px solid var(--gold);color:var(--gold);padding:.6rem 1.5rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.82rem">Book Another</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials" class="section-pad">
+  <div class="reveal" style="text-align:center;margin-bottom:3rem">
+    <div class="section-eyebrow" style="justify-content:center">Social Proof</div>
+    <h2 class="section-title">What They Say</h2>
+    <div class="section-divider" style="margin:1.5rem auto 0"></div>
+  </div>
+  <div id="testiContainer" style="overflow:hidden" onmouseenter="pauseCarousel()" onmouseleave="startCarousel()">
+    <div class="testimonial-track" id="testiTrack"></div>
+  </div>
+  <div class="testi-dots reveal" id="testiDots"></div>
+</section>
+
+<!-- LOCATION -->
+<section id="location" class="section-pad">
+  <div class="location-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">Find Us</div>
+      <h2 class="section-title">Location & Hours</h2>
+      <div class="section-divider"></div>
+      <div style="width:100%;height:280px;overflow:hidden;border:1px solid var(--border-subtle);position:relative">
+        <iframe id="map-iframe" src="" width="100%" height="280" style="border:0;filter:invert(90%) hue-rotate(180deg) saturate(.6) brightness(.85);display:block" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Location map"></iframe>
+      </div>
+      <a id="map-link" href="#" target="_blank" rel="noopener" class="map-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+        Get Directions on Google Maps
+      </a>
+    </div>
+    <div class="reveal">
+      <div style="margin-top:5rem">
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:1.5rem;color:var(--gold)">Opening Hours</h3>
+        <table class="hours-table" id="hoursTable"></table>
+        <div style="margin-top:2rem;padding:1.2rem;background:var(--card);border-left:2px solid var(--gold)">
+          <p style="font-size:.82rem;color:var(--text-muted);line-height:1.6">Walk-ins welcome but booking is recommended on weekends.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo" id="footer-logo">SHOP <span>NAME</span></div>
+      <div class="footer-tagline">Precision. Style. Confidence.</div>
+      <div class="footer-socials" id="footer-socials"></div>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#team">Our Team</a></li>
+        <li><a href="#booking">Book Appointment</a></li>
+        <li><a href="#location">Contact</a></li>
+        <li><a href="#" onclick="openPrivacy(event)">Privacy Policy</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul id="footer-contact"></ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p id="footer-copy">© 2024 Shop Name. All rights reserved.</p>
+    <p style="font-size:.75rem;color:var(--text-dim)">Crafted with precision</p>
+  </div>
+</footer>
+
+<button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- PRIVACY POLICY PAGE -->
+<div id="privacy-page">
+  <div class="privacy-content">
+    <button class="privacy-close" onclick="closePrivacy()">✕ Close</button>
+    <h1>Privacy Policy</h1>
+    <p id="privacy-date" style="color:var(--text-dim);font-size:.8rem;margin-bottom:2rem"></p>
+    <h2>1. Who We Are</h2>
+    <p id="privacy-who"></p>
+    <h2>2. What Data We Collect</h2>
+    <p>When you make a booking, we collect the following personal information:</p>
+    <ul><li>Full name</li><li>Phone number</li><li>Email address</li><li>Appointment preferences (service, barber, date, time)</li><li>Optional notes you provide</li></ul>
+    <h2>3. Why We Collect It</h2>
+    <p>Your data is collected solely for the purpose of processing and managing your appointment booking, sending booking confirmation communications, and providing you with our grooming services.</p>
+    <h2>4. How We Store It</h2>
+    <p>Your data is stored securely in a PostgreSQL database hosted by Supabase (supabase.com), which is located within the European Union. Access to this data is restricted to authorised staff only and is protected by Row Level Security policies.</p>
+    <h2>5. How Long We Keep It</h2>
+    <p>We retain your booking data for a maximum of 2 years from the date of your appointment, after which it is permanently deleted. You may request deletion at any time by contacting us.</p>
+    <h2>6. Your Rights</h2>
+    <p>Under GDPR and applicable data protection law, you have the right to: access your personal data, request correction of inaccurate data, request deletion of your data, withdraw consent at any time, and lodge a complaint with your local supervisory authority.</p>
+    <h2>7. Contact</h2>
+    <p id="privacy-contact"></p>
+  </div>
+</div>
+
+<!-- ADMIN OVERLAY -->
+<div id="admin-overlay">
+  <!-- Login -->
+  <div class="admin-login" id="adminLogin">
+    <h2>Admin Access</h2>
+    <p>Sign in with your Supabase credentials to manage bookings.</p>
+    <div class="admin-login-fields">
+      <div class="form-group"><label>Email</label><input type="email" id="adminEmail" placeholder="admin@yourdomain.com"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="adminPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+      <div class="admin-error" id="adminError">Incorrect email or password.</div>
+      <button class="btn-submit" onclick="adminLogin()" style="grid-column:unset">Sign In</button>
+      <button onclick="closeAdmin()" style="background:transparent;border:.5px solid var(--border-subtle);color:var(--text-muted);padding:.7rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.82rem">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="admin-panel" id="adminDashboard" style="display:none">
+    <div class="admin-header">
+      <div style="display:flex;align-items:center;gap:1rem">
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;letter-spacing:.1em">Admin <span style="color:var(--gold)">Dashboard</span></div>
+        <span id="admin-user-label" style="color:var(--text-dim);font-size:.78rem"></span>
+      </div>
+      <div style="display:flex;gap:.8rem">
+        <button class="btn-sm" onclick="loadAdminData()">↻ Refresh</button>
+        <button class="btn-sm danger" onclick="adminSignOut()">Sign Out</button>
+        <button class="btn-sm danger" onclick="closeAdmin()">✕ Close</button>
+      </div>
+    </div>
+
+    <div class="admin-stats">
+      <div class="admin-stat"><div class="admin-stat-val" id="stat-today">—</div><div class="admin-stat-label">Today's Bookings</div></div>
+      <div class="admin-stat"><div class="admin-stat-val" id="stat-week">—</div><div class="admin-stat-label">This Week</div></div>
+      <div class="admin-stat"><div class="admin-stat-val" id="stat-total">—</div><div class="admin-stat-label">All Time</div></div>
+      <div class="admin-stat"><div class="admin-stat-val" id="stat-pending">—</div><div class="admin-stat-label">Pending</div></div>
+    </div>
+
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchTab('appointments')">Appointments</button>
+      <button class="admin-tab" onclick="switchTab('analytics')">Analytics</button>
+      <button class="admin-tab" onclick="switchTab('schedule')">Schedule</button>
+    </div>
+
+    <!-- APPOINTMENTS TAB -->
+    <div class="admin-section active" id="tab-appointments">
+      <div class="filter-bar">
+        <input type="text" placeholder="Search name or phone…" id="adminSearch" oninput="filterAppts()" style="flex:1;min-width:200px">
+        <select id="adminFilterDate" onchange="filterAppts()">
+          <option value="">All dates</option>
+          <option value="today">Today</option>
+          <option value="week">This week</option>
+        </select>
+        <select id="adminFilterStatus" onchange="filterAppts()">
+          <option value="">All status</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="pending">Pending</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div id="appointmentsTable"><div class="empty-state">Loading…</div></div>
+    </div>
+
+    <!-- ANALYTICS TAB -->
+    <div class="admin-section" id="tab-analytics">
+      <div class="chart-grid" id="analytics-content"><div class="empty-state">Loading analytics…</div></div>
+    </div>
+
+    <!-- SCHEDULE TAB -->
+    <div class="admin-section" id="tab-schedule">
+      <p style="color:var(--text-muted);font-size:.88rem;margin-bottom:1.5rem">Block off time or manage barber availability.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:600px">
+        <div class="form-group"><label>Barber</label><select id="blockBarber"></select></div>
+        <div class="form-group"><label>Date</label><input type="date" id="blockDate"></div>
+        <div class="form-group"><label>From</label><input type="time" id="blockFrom" value="09:00"></div>
+        <div class="form-group"><label>To</label><input type="time" id="blockTo" value="17:00"></div>
+        <div class="form-group" style="grid-column:span 2"><label>Reason</label><input type="text" id="blockReason" placeholder="Holiday, Sick day, Training…"></div>
+        <button class="btn-submit" style="grid-column:span 2" onclick="alert('Requires a blocked_slots table in Supabase.')">Block Schedule</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  ██████╗ ██████╗ ███╗   ██╗███████╗██╗ ██████╗
+// ██╔════╝██╔═══██╗████╗  ██║██╔════╝██║██╔════╝
+// ██║     ██║   ██║██╔██╗ ██║█████╗  ██║██║  ███╗
+// ██║     ██║   ██║██║╚██╗██║██╔══╝  ██║██║   ██║
+// ╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝
+//  ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝
+//
+//  ✦ EVERYTHING YOU NEED TO CHANGE PER CLIENT IS IN THIS BLOCK ✦
+//  ✦ DO NOT TOUCH ANYTHING BELOW THE CONFIG BLOCK              ✦
+// ════════════════════════════════════════════════════════════════
+
+const CONFIG = {
+
+  // ── SHOP IDENTITY ─────────────────────────────────────────────
+  shopName:    'BLVCK FADES',           // Displayed in nav, footer, page title
+  shopTagline: 'Sharper Looks.',        // Second line of hero (italic gold)
+  shopLine1:   'SHARP CUTS.',           // First line of hero
+  established: 'Est. 2012',             // Hero eyebrow text
+  heroSub:     'Premium grooming for the modern gentleman. Four master barbers, one standard — perfection. Walk-ins welcome.',
+  aboutText:   'Founded in 2012 in the heart of Belgrade, BLVCK FADES has been the go-to destination for men who understand that a great haircut is a statement. Our barbers are artists. Our shop is your sanctuary.',
+
+  // ── SUPABASE ──────────────────────────────────────────────────
+  supabaseUrl:     'https://tkdiopmdptmleotgtvax.supabase.co',
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRrZGlvcG1kcHRtbGVvdGd0dmF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTc0MTAsImV4cCI6MjA5MjYzMzQxMH0.ek_yTACRGFftdlx1e7SXujwVJh15Xnim9nCTA0-fCpQ',
+  edgeFunctionUrl: 'https://tkdiopmdptmleotgtvax.supabase.co/functions/v1/send-booking-email',
+
+  // ── CONTACT & LOCATION ────────────────────────────────────────
+  address:    '123 Knez Mihailova, Belgrade 11000, Serbia',
+  phone:      '+381 11 123 4567',
+  email:      'hello@blvckfades.rs',
+  googleMapsEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2830.5!2d20.4582!3d44.8178!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x475a7aa3bda7a8b9%3A0x1e7d4e4e4e4e4e4e!2sKnez%20Mihailova%2C%20Beograd!5e0!3m2!1sen!2srs!4v1700000000000!5m2!1sen!2srs',
+  googleMapsLink: 'https://www.google.com/maps/search/Knez+Mihailova+123,+Belgrade,+Serbia',
+
+  // ── SOCIAL MEDIA ──────────────────────────────────────────────
+  // Set to '' to hide a button
+  instagram: 'https://instagram.com',
+  facebook:  'https://facebook.com',
+  tiktok:    'https://tiktok.com',
+
+  // ── OPENING HOURS ─────────────────────────────────────────────
+  // Format: ['DAY NAME', 'HH:MM AM – HH:MM PM'] or ['DAY', 'Closed']
+  // Days must be in order Sun(0) Mon(1) Tue(2) Wed(3) Thu(4) Fri(5) Sat(6)
+  hours: [
+    ['Sunday',    '10:00 AM – 5:00 PM'],
+    ['Monday',    '9:00 AM – 8:00 PM'],
+    ['Tuesday',   '9:00 AM – 8:00 PM'],
+    ['Wednesday', '9:00 AM – 8:00 PM'],
+    ['Thursday',  '9:00 AM – 8:00 PM'],
+    ['Friday',    '9:00 AM – 8:00 PM'],
+    ['Saturday',  '8:00 AM – 7:00 PM'],
+  ],
+
+  // ── BOOKING TIME SLOTS ────────────────────────────────────────
+  timeSlots: ['9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM','6:00 PM','7:00 PM'],
+  maxBookingDaysAhead: 14,
+
+  // ── SERVICES ──────────────────────────────────────────────────
+  services: [
+    { name: 'Classic Haircut',    price: '$25',  duration: '30 min', desc: 'Precision cut tailored to your head shape and lifestyle.' },
+    { name: 'Beard Trim',         price: '$20',  duration: '20 min', desc: 'Sculpted lines and clean edges shaped to complement your face.' },
+    { name: 'Hot Towel Shave',    price: '$35',  duration: '45 min', desc: 'The classic wet shave ritual — steam, blade, and finishing balm.' },
+    { name: 'Hair + Beard Combo', price: '$40',  duration: '55 min', desc: 'The full package — haircut and beard treatment combined.' },
+    { name: 'Kids Cut',           price: '$18',  duration: '25 min', desc: 'Patient, fun and precise. For young gents under 12.' },
+    { name: 'Hair Coloring',      price: '$60+', duration: '90 min', desc: 'Full color, highlights, or grey blending — executed with precision.' },
+  ],
+
+  // ── BARBERS ───────────────────────────────────────────────────
+  barbers: [
+    { name: 'Marcus King',   initials: 'MK', role: 'Head Barber',        specialty: 'High Fades & Geometric Designs', bg: 'linear-gradient(160deg,#1a1408,#3d2e10)' },
+    { name: 'Dragan Jović',  initials: 'DJ', role: 'Master Barber',      specialty: 'Classic Cuts & Hot Towel Shaves', bg: 'linear-gradient(160deg,#0e1a10,#1a3020)' },
+    { name: 'Alex Lukić',    initials: 'AL', role: 'Senior Barber',      specialty: 'Tapers, Skin Fades & Texture',   bg: 'linear-gradient(160deg,#1a0e0e,#2e1414)' },
+    { name: 'Nikola Petrić', initials: 'NP', role: 'Barber & Colorist',  specialty: 'Color, Highlights & Creative Cuts', bg: 'linear-gradient(160deg,#100e1a,#1a1830)' },
+  ],
+
+  // ── TESTIMONIALS ──────────────────────────────────────────────
+  testimonials: [
+    { name: 'Stefan M.',      quote: 'Best barbershop in Belgrade, no contest. Marcus gave me the cleanest fade I\'ve had in ten years. Worth every dinar.' },
+    { name: 'Aleksandar V.',  quote: 'Came in before my wedding. The experience was absolutely top tier. The shop itself is stunning.' },
+    { name: 'Marko T.',       quote: 'I drive 40 minutes just to come here. Alex understands exactly what I want without me explaining it twice.' },
+    { name: 'Ivan K.',        quote: 'Nikola did my color and it came out better than any salon I\'ve been to. These guys do it all and do it right.' },
+    { name: 'Nikola R.',      quote: 'The ambience, the music — it\'s a whole vibe. And the haircut was sharp enough to get me a second date.' },
+  ],
+
+};
+
+// ════════════════════════════════════════════════════════════════
+//  END OF CONFIG — DO NOT EDIT BELOW THIS LINE
+// ════════════════════════════════════════════════════════════════
+
+// ── SUPABASE INIT ────────────────────────────────────────────────
+const sb = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey);
+
+// ── POPULATE PAGE FROM CONFIG ─────────────────────────────────────
+function buildPage() {
+  // Title & nav
+  document.title = CONFIG.shopName + ' — Premium Barbershop';
+  document.getElementById('page-title').textContent = CONFIG.shopName + ' — Premium Barbershop';
+  document.getElementById('nav-logo-text').innerHTML = CONFIG.shopName.replace(' ','&nbsp;<span>') + '</span>';
+  document.getElementById('footer-logo').innerHTML = CONFIG.shopName.replace(' ','&nbsp;<span>') + '</span>';
+  document.getElementById('footer-copy').textContent = '© ' + new Date().getFullYear() + ' ' + CONFIG.shopName + '. All rights reserved.';
+
+  // Hero
+  document.getElementById('hero-eyebrow').childNodes[1] && (document.getElementById('hero-eyebrow').textContent = '');
+  document.getElementById('hero-eyebrow').textContent = CONFIG.established + ' — Premium Barbershop';
+  document.getElementById('hero-line1').textContent = CONFIG.shopLine1;
+  document.getElementById('hero-line2').textContent = CONFIG.shopTagline;
+  document.getElementById('hero-sub').textContent = CONFIG.heroSub;
+  document.getElementById('about-text').textContent = CONFIG.aboutText;
+
+  // Services grid
+  const svcIcons = [
+    '<circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4"/><path d="M16 3.13a4 4 0 010 7.75M21 21v-2a4 4 0 00-3-3.85"/>',
+    '<path d="M7 10c0 3 2 5 5 5s5-2 5-5V6a2 2 0 00-2-2H9a2 2 0 00-2 2v4z"/><path d="M12 15v4M8 19h8"/>',
+    '<path d="M12 2a7 7 0 017 7c0 5-7 13-7 13S5 14 5 9a7 7 0 017-7z"/><circle cx="12" cy="9" r="2"/>',
+    '<path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z"/>',
+    '<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>',
+    '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>',
+  ];
+  document.getElementById('services-grid').innerHTML = CONFIG.services.map((s,i) => `
+    <div class="service-card">
+      <svg class="service-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">${svcIcons[i]||svcIcons[0]}</svg>
+      <div class="service-name">${s.name}</div>
+      <div class="service-desc">${s.desc}</div>
+      <div class="service-price">${s.price} <span class="service-duration">/ ${s.duration}</span></div>
+    </div>`).join('');
+
+  // Team grid
+  document.getElementById('team-grid').innerHTML = CONFIG.barbers.map(b => `
+    <div class="team-card">
+      <div class="team-avatar" style="background:${b.bg}">${b.initials}</div>
+      <div class="team-info">
+        <div class="team-name">${b.name}</div>
+        <div class="team-role">${b.role}</div>
+        <div class="team-specialty">Specialty: ${b.specialty}</div>
+      </div>
+    </div>`).join('');
+
+  // Booking form selects
+  const svcSel = document.getElementById('f-service');
+  CONFIG.services.forEach(s => { const o = document.createElement('option'); o.value = s.name; o.textContent = `${s.name} — ${s.price}`; svcSel.appendChild(o); });
+  const barbSel = document.getElementById('f-barber');
+  CONFIG.barbers.forEach(b => { const o = document.createElement('option'); o.value = b.name; o.textContent = b.name; barbSel.appendChild(o); });
+
+  // Booking contact sidebar
+  document.getElementById('booking-contact').innerHTML = [
+    ['◎', CONFIG.address],
+    ['◎', CONFIG.phone],
+    ['◎', CONFIG.email],
+  ].map(([icon, text]) => `<div class="booking-contact-item"><span>${icon}</span> ${text}</div>`).join('');
+
+  // Testimonials
+  const track = document.getElementById('testiTrack');
+  const dots = document.getElementById('testiDots');
+  track.innerHTML = CONFIG.testimonials.map(t => `
+    <div class="testimonial-slide">
+      <div class="testi-stars">★★★★★</div>
+      <p class="testi-quote">"${t.quote}"</p>
+      <div class="testi-author">— ${t.name}</div>
+    </div>`).join('');
+  dots.innerHTML = CONFIG.testimonials.map((_,i) => `<div class="testi-dot${i===0?' active':''}" onclick="goToSlide(${i})"></div>`).join('');
+
+  // Hours table
+  const today = new Date().getDay();
+  document.getElementById('hoursTable').innerHTML = CONFIG.hours.map((h,i) => `
+    <tr data-day="${i}"${i===today?' class="today"':''}><td>${h[0]}</td><td>${h[1]}</td></tr>`).join('');
+
+  // Map
+  document.getElementById('map-iframe').src = CONFIG.googleMapsEmbed;
+  document.getElementById('map-link').href = CONFIG.googleMapsLink;
+
+  // Socials
+  const socials = [];
+  if (CONFIG.instagram) socials.push(`<a href="${CONFIG.instagram}" target="_blank" rel="noopener" class="social-btn" title="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>`);
+  if (CONFIG.facebook) socials.push(`<a href="${CONFIG.facebook}" target="_blank" rel="noopener" class="social-btn" title="Facebook"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>`);
+  if (CONFIG.tiktok) socials.push(`<a href="${CONFIG.tiktok}" target="_blank" rel="noopener" class="social-btn" title="TikTok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></svg></a>`);
+  document.getElementById('footer-socials').innerHTML = socials.join('');
+
+  // Footer contact
+  document.getElementById('footer-contact').innerHTML = `
+    <li><span style="color:var(--text-muted);font-size:.85rem">${CONFIG.phone}</span></li>
+    <li><span style="color:var(--text-muted);font-size:.85rem">${CONFIG.email}</span></li>
+    <li><span style="color:var(--text-muted);font-size:.85rem">${CONFIG.address}</span></li>`;
+
+  // Privacy policy
+  document.getElementById('privacy-date').textContent = 'Last updated: ' + new Date().toLocaleDateString('en-GB', {year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('privacy-who').textContent = `${CONFIG.shopName} ("we", "us") is a barbershop business located at ${CONFIG.address}. We are the data controller for personal information collected through this website.`;
+  document.getElementById('privacy-contact').textContent = `To exercise your rights or ask questions about your data, contact us at ${CONFIG.email} or by phone at ${CONFIG.phone}.`;
+
+  // Schedule tab barber dropdown
+  document.getElementById('blockBarber').innerHTML = CONFIG.barbers.map(b => `<option>${b.name}</option>`).join('');
+}
+
+// ── NAV ──────────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+  document.getElementById('back-top').classList.toggle('visible', window.scrollY > 300);
+});
+function toggleDrawer() { document.getElementById('mobileDrawer').classList.toggle('open'); }
+
+// ── REVEAL ON SCROLL ─────────────────────────────────────────────
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// ── STAT COUNTERS ────────────────────────────────────────────────
+const counterObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el = entry.target;
+    const target = parseInt(el.dataset.target);
+    const isDecimal = el.dataset.decimal === 'true';
+    let current = 0;
+    const timer = setInterval(() => {
+      current += target / 60;
+      if (current >= target) { current = target; clearInterval(timer); }
+      el.textContent = isDecimal ? (current/10).toFixed(1) : Math.floor(current) + (target >= 100 ? '+' : '');
+    }, 30);
+    counterObs.unobserve(el);
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-target]').forEach(el => counterObs.observe(el));
+
+// ── GALLERY / LIGHTBOX ───────────────────────────────────────────
+const galleryItems = [
+  {label:'High Fade',bg:'linear-gradient(160deg,#1a1408,#3d2e10,#1a1408)'},
+  {label:'Taper Cut',bg:'linear-gradient(135deg,#0f1a14,#1a3020,#0a100c)'},
+  {label:'Beard Shape',bg:'linear-gradient(160deg,#1a0f08,#2e1a0a,#120b04)'},
+  {label:'Skin Fade',bg:'linear-gradient(120deg,#0e0e1a,#1a1830,#080812)'},
+  {label:'Classic Pompadour',bg:'linear-gradient(160deg,#1a1408,#2a2010,#100e06)'},
+  {label:'Full Combo',bg:'linear-gradient(135deg,#0d1a0d,#162416,#090e09)'},
+  {label:'Drop Fade',bg:'linear-gradient(160deg,#1a0e0e,#2e1414,#100808)'},
+  {label:'Textured Crop',bg:'linear-gradient(120deg,#14141a,#201e2e,#0c0c14)'},
+  {label:'Hot Shave',bg:'linear-gradient(135deg,#1a1000,#3a2800,#140e00)'},
+];
+let currentLightbox = 0;
+function openLightbox(i) { currentLightbox = i; renderLightbox(); document.getElementById('lightbox').classList.add('open'); }
+function renderLightbox() {
+  const item = galleryItems[currentLightbox];
+  document.getElementById('lightboxDisplay').style.background = item.bg;
+  document.getElementById('lightboxDisplay').innerHTML = `<div style="height:100%;display:flex;align-items:flex-end;padding:1.5rem"><span style="font-family:'Playfair Display',serif;font-size:1.5rem;font-style:italic;color:rgba(255,255,255,.7)">${item.label}</span></div>`;
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+function closeLightboxOutside(e) { if (e.target.id === 'lightbox') closeLightbox(); }
+function lightboxNav(dir) { currentLightbox = (currentLightbox + dir + galleryItems.length) % galleryItems.length; renderLightbox(); }
+
+// ── TESTIMONIALS CAROUSEL ────────────────────────────────────────
+let currentSlide = 0; let carouselTimer;
+function goToSlide(i) {
+  currentSlide = i;
+  document.getElementById('testiTrack').style.transform = `translateX(-${i*100}%)`;
+  document.querySelectorAll('.testi-dot').forEach((d,idx) => d.classList.toggle('active', idx===i));
+}
+function startCarousel() { carouselTimer = setInterval(() => goToSlide((currentSlide+1) % CONFIG.testimonials.length), 4500); }
+function pauseCarousel() { clearInterval(carouselTimer); }
+
+// ── BOOKING ───────────────────────────────────────────────────────
+const todayDate = new Date();
+const maxDate = new Date(); maxDate.setDate(todayDate.getDate() + CONFIG.maxBookingDaysAhead);
+const todayStr = todayDate.toISOString().split('T')[0];
+const maxStr = maxDate.toISOString().split('T')[0];
+const dateInput = document.getElementById('f-date');
+dateInput.min = todayStr; dateInput.max = maxStr; dateInput.value = todayStr;
+
+let selectedTime = null;
+let takenSlots = [];
+
+async function renderSlots(date) {
+  const container = document.getElementById('timeSlots');
+  container.innerHTML = '<span style="color:var(--text-dim);font-size:.8rem">Loading slots…</span>';
+  selectedTime = null;
+  const selectedBarber = document.getElementById('f-barber').value;
+  if (date) {
+    const { data } = await sb.from('appointments').select('time,barber').eq('date', date).neq('status','cancelled');
+    if (data) {
+      takenSlots = data.filter(d => {
+        if (selectedBarber === 'No preference') return true;
+        return d.barber === selectedBarber || d.barber === 'No preference';
+      }).map(d => d.time);
+    } else { takenSlots = []; }
+  }
+  container.innerHTML = '';
+  CONFIG.timeSlots.forEach(slot => {
+    const chip = document.createElement('button');
+    const taken = takenSlots.includes(slot);
+    chip.className = 'time-chip' + (taken ? ' taken' : '');
+    chip.textContent = slot; chip.disabled = taken;
+    chip.onclick = () => {
+      document.querySelectorAll('.time-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected'); selectedTime = slot;
+    };
+    container.appendChild(chip);
+  });
+}
+
+dateInput.addEventListener('change', () => renderSlots(dateInput.value));
+document.getElementById('f-barber').addEventListener('change', () => renderSlots(dateInput.value));
+
+async function submitBooking() {
+  const name    = document.getElementById('f-name').value.trim();
+  const phone   = document.getElementById('f-phone').value.trim();
+  const email   = document.getElementById('f-email').value.trim();
+  const service = document.getElementById('f-service').value;
+  const barber  = document.getElementById('f-barber').value;
+  const date    = document.getElementById('f-date').value;
+  const notes   = document.getElementById('f-notes').value.trim();
+  const agreed  = document.getElementById('privacy-agree').checked;
+
+  if (!name || !phone || !email || !service || !date || !selectedTime) {
+    alert('Please fill in all required fields and select a time slot.'); return;
+  }
+  if (!agreed) { alert('Please read and accept the Privacy Policy to continue.'); return; }
+
+  const btn = document.querySelector('.btn-submit');
+  btn.disabled = true; btn.textContent = 'Processing…';
+
+  const { error } = await sb.from('appointments').insert([{
+    name, phone, email, service, barber, date,
+    time: selectedTime, notes, status: 'pending',
+    created_at: new Date().toISOString()
+  }]);
+
+  if (error) {
+    alert('Error saving booking: ' + error.message);
+    btn.disabled = false; btn.textContent = 'Confirm Booking'; return;
+  }
+
+  // Send confirmation email
+  fetch(CONFIG.edgeFunctionUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${CONFIG.supabaseAnonKey}` },
+    body: JSON.stringify({ name, email, service, barber, date, time: selectedTime })
+  }).catch(err => console.warn('Email notification failed:', err));
+
+  document.getElementById('successMsg').textContent = `Thanks ${name}! Your ${service} on ${date} at ${selectedTime} has been received. A confirmation has been sent to ${email}.`;
+  document.querySelector('.booking-success').style.display = 'block';
+  document.querySelectorAll('.booking-form > *:not(.booking-success)').forEach(el => el.style.display = 'none');
+}
+
+function resetBooking() {
+  document.querySelector('.booking-success').style.display = 'none';
+  document.querySelectorAll('.booking-form > *').forEach(el => el.style.display = '');
+  ['f-name','f-phone','f-email','f-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-service').value = '';
+  document.getElementById('privacy-agree').checked = false;
+  selectedTime = null;
+  const btn = document.querySelector('.btn-submit');
+  btn.disabled = false; btn.textContent = 'Confirm Booking';
+  renderSlots(dateInput.value);
+}
+
+// ── PRIVACY POLICY ────────────────────────────────────────────────
+function openPrivacy(e) { if(e) e.preventDefault(); document.getElementById('privacy-page').classList.add('open'); }
+function closePrivacy() { document.getElementById('privacy-page').classList.remove('open'); }
+
+// ── ADMIN AUTH (Supabase Auth) ────────────────────────────────────
+let isAdminAuthed = false;
+
+function openAdmin(e) {
+  if (e) e.preventDefault();
+  document.getElementById('admin-overlay').classList.add('open');
+  if (isAdminAuthed) {
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminDashboard').style.display = 'block';
+  } else {
+    document.getElementById('adminLogin').style.display = 'block';
+    document.getElementById('adminDashboard').style.display = 'none';
+  }
+}
+
+function closeAdmin() { document.getElementById('admin-overlay').classList.remove('open'); }
+
+async function adminLogin() {
+  const email = document.getElementById('adminEmail').value.trim();
+  const password = document.getElementById('adminPassword').value;
+  const errEl = document.getElementById('adminError');
+  errEl.style.display = 'none';
+
+  if (!email || !password) { errEl.textContent = 'Please enter your email and password.'; errEl.style.display = 'block'; return; }
+
+  const btn = document.querySelector('.admin-login-fields .btn-submit');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+  if (error || !data.user) {
+    errEl.textContent = 'Incorrect email or password.';
+    errEl.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Sign In';
+    return;
+  }
+
+  isAdminAuthed = true;
+  document.getElementById('admin-user-label').textContent = '(' + data.user.email + ')';
+  document.getElementById('adminLogin').style.display = 'none';
+  document.getElementById('adminDashboard').style.display = 'block';
+  loadAdminData();
+}
+
+async function adminSignOut() {
+  await sb.auth.signOut();
+  isAdminAuthed = false;
+  document.getElementById('adminDashboard').style.display = 'none';
+  document.getElementById('adminLogin').style.display = 'block';
+  document.getElementById('adminPassword').value = '';
+  document.getElementById('adminEmail').value = '';
+}
+
+// ── ADMIN DATA ────────────────────────────────────────────────────
+let allAppointments = [];
+
+async function loadAdminData() {
+  const { data, error } = await sb.from('appointments').select('*').order('date',{ascending:true}).order('time',{ascending:true});
+  if (error) { console.error(error); return; }
+  allAppointments = data || [];
+  filterAppts();
+  updateStats(allAppointments);
+  renderAnalytics(allAppointments);
+}
+
+function updateStats(data) {
+  const today = new Date().toISOString().split('T')[0];
+  const weekStart = new Date(); weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+  document.getElementById('stat-today').textContent   = data.filter(a => a.date === today).length;
+  document.getElementById('stat-week').textContent    = data.filter(a => new Date(a.date) >= weekStart).length;
+  document.getElementById('stat-total').textContent   = data.length;
+  document.getElementById('stat-pending').textContent = data.filter(a => a.status === 'pending').length;
+}
+
+function filterAppts() {
+  const search  = document.getElementById('adminSearch').value.toLowerCase();
+  const dateFil = document.getElementById('adminFilterDate').value;
+  const statFil = document.getElementById('adminFilterStatus').value;
+  const today   = new Date().toISOString().split('T')[0];
+  const weekStart = new Date(); weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+
+  const filtered = allAppointments.filter(a => {
+    const matchSearch  = !search  || a.name.toLowerCase().includes(search) || (a.phone||'').includes(search);
+    const matchDate    = !dateFil || (dateFil==='today' && a.date===today) || (dateFil==='week' && new Date(a.date)>=weekStart);
+    const matchStatus  = !statFil || a.status===statFil;
+    return matchSearch && matchDate && matchStatus;
+  });
+  renderAppointmentsTable(filtered);
+}
+
+function renderAppointmentsTable(data) {
+  const container = document.getElementById('appointmentsTable');
+  if (!data.length) { container.innerHTML = '<div class="empty-state">No appointments found.</div>'; return; }
+  container.innerHTML = `<table class="appt-table">
+    <thead><tr><th>Date & Time</th><th>Client</th><th>Service</th><th>Barber</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${data.map(a => `<tr>
+      <td><strong style="color:var(--text)">${a.date}</strong><br><span style="font-size:.78rem">${a.time}</span></td>
+      <td><strong style="color:var(--text)">${a.name}</strong><br><span style="font-size:.78rem">${a.phone||''}</span></td>
+      <td>${a.service}</td>
+      <td>${a.barber}</td>
+      <td><span class="status-badge status-${a.status}">${a.status}</span></td>
+      <td style="white-space:nowrap"><div style="display:inline-flex;gap:.4rem;align-items:center">
+        ${a.status==='pending'?`<button class="btn-sm" onclick="updateStatus(${a.id},'confirmed')">✓ Confirm</button>`:''}
+        ${a.status!=='cancelled'?`<button class="btn-sm danger" onclick="updateStatus(${a.id},'cancelled')">✕ Cancel</button>`:'<span style="font-size:.75rem;color:var(--text-dim)">—</span>'}
+      </div></td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+async function updateStatus(id, status) {
+  const res = await fetch(`${CONFIG.supabaseUrl}/rest/v1/appointments?id=eq.${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type':'application/json', 'apikey':CONFIG.supabaseAnonKey, 'Authorization':`Bearer ${CONFIG.supabaseAnonKey}`, 'Prefer':'return=representation' },
+    body: JSON.stringify({ status })
+  });
+  if (!res.ok) { const err = await res.json().catch(()=>({})); alert('Update failed: '+(err.message||res.statusText)); return; }
+  allAppointments = allAppointments.map(a => a.id===id ? {...a,status} : a);
+  filterAppts(); updateStats(allAppointments); renderAnalytics(allAppointments);
+}
+
+// ── ANALYTICS ─────────────────────────────────────────────────────
+function renderAnalytics(data) {
+  const confirmed = data.filter(a => a.status !== 'cancelled');
+  if (!confirmed.length) { document.getElementById('analytics-content').innerHTML = '<div class="empty-state">No booking data yet.</div>'; return; }
+
+  // Services breakdown
+  const svcCount = {};
+  confirmed.forEach(a => { svcCount[a.service] = (svcCount[a.service]||0) + 1; });
+  const svcSorted = Object.entries(svcCount).sort((x,y) => y[1]-x[1]);
+  const svcMax = svcSorted[0]?.[1] || 1;
+
+  // Barber breakdown
+  const barberCount = {};
+  confirmed.forEach(a => { barberCount[a.barber] = (barberCount[a.barber]||0) + 1; });
+  const barberSorted = Object.entries(barberCount).sort((x,y) => y[1]-x[1]);
+  const barberMax = barberSorted[0]?.[1] || 1;
+
+  // Day of week breakdown
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dayCount = Array(7).fill(0);
+  confirmed.forEach(a => { const d = new Date(a.date).getDay(); dayCount[d]++; });
+  const dayMax = Math.max(...dayCount) || 1;
+
+  // This week vs last week
+  const now = new Date();
+  const weekStart = new Date(now); weekStart.setDate(now.getDate() - now.getDay());
+  const lastWeekStart = new Date(weekStart); lastWeekStart.setDate(weekStart.getDate() - 7);
+  const thisWeek = confirmed.filter(a => new Date(a.date) >= weekStart).length;
+  const lastWeek = confirmed.filter(a => { const d = new Date(a.date); return d >= lastWeekStart && d < weekStart; }).length;
+  const weekDiff = lastWeek === 0 ? (thisWeek > 0 ? '+100%' : '—') : ((thisWeek-lastWeek)/lastWeek*100).toFixed(0)+'%';
+  const weekColor = thisWeek >= lastWeek ? 'var(--gold)' : '#e05555';
+
+  document.getElementById('analytics-content').innerHTML = `
+    <div class="chart-card" style="grid-column:span 2;display:flex;gap:2rem;align-items:center;flex-wrap:wrap">
+      <div style="flex:1;min-width:150px;text-align:center;padding:1rem;background:var(--card2)">
+        <div style="font-size:2.5rem;font-family:'Playfair Display',serif;font-weight:700;color:var(--gold)">${thisWeek}</div>
+        <div style="font-size:.75rem;color:var(--text-dim);margin-top:.3rem;letter-spacing:.1em;text-transform:uppercase">This Week</div>
+      </div>
+      <div style="flex:1;min-width:150px;text-align:center;padding:1rem;background:var(--card2)">
+        <div style="font-size:2.5rem;font-family:'Playfair Display',serif;font-weight:700;color:var(--text-muted)">${lastWeek}</div>
+        <div style="font-size:.75rem;color:var(--text-dim);margin-top:.3rem;letter-spacing:.1em;text-transform:uppercase">Last Week</div>
+      </div>
+      <div style="flex:1;min-width:150px;text-align:center;padding:1rem;background:var(--card2)">
+        <div style="font-size:2.5rem;font-family:'Playfair Display',serif;font-weight:700;color:${weekColor}">${weekDiff}</div>
+        <div style="font-size:.75rem;color:var(--text-dim);margin-top:.3rem;letter-spacing:.1em;text-transform:uppercase">Week Change</div>
+      </div>
+      <div style="flex:1;min-width:150px;text-align:center;padding:1rem;background:var(--card2)">
+        <div style="font-size:2.5rem;font-family:'Playfair Display',serif;font-weight:700;color:var(--gold)">${confirmed.length}</div>
+        <div style="font-size:.75rem;color:var(--text-dim);margin-top:.3rem;letter-spacing:.1em;text-transform:uppercase">Total Confirmed</div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h4>Bookings by Service</h4>
+      <div class="bar-chart">${svcSorted.map(([name,count]) => `
+        <div class="bar-row">
+          <div class="bar-label">${name.split(' ').slice(0,2).join(' ')}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(count/svcMax*100).toFixed(0)}%"></div></div>
+          <div class="bar-val">${count}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h4>Bookings by Barber</h4>
+      <div class="bar-chart">${barberSorted.map(([name,count]) => `
+        <div class="bar-row">
+          <div class="bar-label">${name.split(' ')[0]}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(count/barberMax*100).toFixed(0)}%"></div></div>
+          <div class="bar-val">${count}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="chart-card" style="grid-column:span 2">
+      <h4>Bookings by Day of Week</h4>
+      <div class="bar-chart">${days.map((day,i) => `
+        <div class="bar-row">
+          <div class="bar-label">${day}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(dayCount[i]/dayMax*100).toFixed(0)}%"></div></div>
+          <div class="bar-val">${dayCount[i]}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function switchTab(tab) {
+  const tabs = ['appointments','analytics','schedule'];
+  document.querySelectorAll('.admin-tab').forEach((t,i) => t.classList.toggle('active', tabs[i]===tab));
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+buildPage();
+renderSlots(todayStr);
+startCarousel();
+
+// Check if already signed in from a previous session
+sb.auth.getSession().then(({ data }) => {
+  if (data.session) {
+    isAdminAuthed = true;
+    document.getElementById('admin-user-label').textContent = '(' + data.session.user.email + ')';
+  }
+});
+</script>
+</body>
+</html>
